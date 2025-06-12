@@ -7,7 +7,6 @@ import { useState, useEffect } from "react";
 
 export default function Footer() {
   const [ip, setIp] = useState<string>("");
-  const [loc, setLoc] = useState<string>("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,23 +24,6 @@ export default function Footer() {
     };
 
     fetchIp();
-  }, []);
-
-  useEffect(() => {
-    const fetchLoc = async () => {
-      try {
-        const response = await fetch("/api/get-location");
-        const data = await response.json();
-        setLoc(data.loc || "Unknown");
-      } catch (error) {
-        console.error("Failed to fetch Location:", error);
-        setLoc("Unknown");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchLoc();
   }, []);
 
   return (
