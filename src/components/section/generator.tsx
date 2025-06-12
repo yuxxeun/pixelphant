@@ -2,21 +2,12 @@
 
 import type React from "react";
 import { useState, useRef, useCallback, useEffect } from "react";
-import {
-  Upload,
-  Download,
-  Type,
-  ImageIcon,
-  Sparkles,
-  X,
-  AlertCircleIcon,
-} from "lucide-react";
+import { Upload, Download, Type, ImageIcon, Sparkles, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -27,8 +18,6 @@ import { Badge } from "@/components/ui/badge";
 import { Slider } from "@/components/ui/slider";
 import confetti from "canvas-confetti";
 import Image from "next/image";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Site } from "@/lib/constant";
 
 const FAVICON_SIZES = [16, 32, 48, 64, 128, 256];
 const BACKGROUND_COLORS = [
@@ -66,7 +55,7 @@ function launchConfetti() {
   }, 200);
 }
 
-export default function FaviconGenerator() {
+export default function Generator() {
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [letter, setLetter] = useState("");
   const [backgroundColor, setBackgroundColor] = useState("#000000");
@@ -75,7 +64,7 @@ export default function FaviconGenerator() {
     { size: number; url: string }[]
   >([]);
   const [isDragging, setIsDragging] = useState(false);
-  const [borderRadius, setBorderRadius] = useState(20);
+  const [borderRadius, setBorderRadius] = useState(8);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -233,78 +222,75 @@ export default function FaviconGenerator() {
   }, [uploadedImage, borderRadius]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
+    <div className="min-h-screen bg-white">
       <div className="max-w-4xl mx-auto px-6 py-12">
         {/* Header */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
-              <Sparkles className="animate-pulse h-5 w-5 text-white" />
+            <div className="p-2 bg-black rounded-lg">
+              <Sparkles className="h-5 w-5 text-white" />
             </div>
-            <h1 className="text-2xl font-semibold text-white">{Site.title}</h1>
+            <h1 className="text-2xl font-semibold text-gray-900">
+              Favicon Generator
+            </h1>
           </div>
-          <p className="text-gray-300 text-sm leading-relaxed max-w-2xl">
-            Generate high-quality favicons for your app.
-            <br />
-            Upload an image or create from a letter with precise control over
-            styling.
+          <p className="text-gray-600 text-sm leading-relaxed max-w-2xl">
+            Generate high-quality favicons for your website. Upload an image or
+            create from a letter with precise control over styling.
           </p>
         </div>
 
         {/* Main Content */}
         <div className="space-y-8">
           <Tabs defaultValue="upload" className="w-full">
-            <div className="flex justify-center mb-2">
-              <TabsList className="inline-flex h-12 items-center justify-center rounded-xl px-4 py-2 gap-2 bg-white/5 backdrop-blur-sm border border-white/10">
+            <div className="flex justify-center mb-8">
+              <TabsList className="inline-flex h-10 items-center justify-center rounded-full bg-gray-100 p-1 text-gray-500">
                 <TabsTrigger
                   value="upload"
-                  className="relative inline-flex items-center justify-center whitespace-nowrap rounded-lg px-6 py-3 text-sm font-medium text-gray-300 transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-lg data-[state=active]:scale-105 hover:bg-white/10 hover:text-white gap-2"
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-800 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm gap-2"
                 >
-                  <ImageIcon className="h-4 w-4 transition-transform duration-300 ease-in-out" />
+                  <ImageIcon className="h-4 w-4" />
                   Upload Image
                 </TabsTrigger>
                 <TabsTrigger
                   value="letter"
-                  className="relative inline-flex items-center justify-center whitespace-nowrap rounded-lg px-6 py-3 text-sm font-medium text-gray-300 transition-all duration-300 ease-in-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/20 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-lg data-[state=active]:scale-105 hover:bg-white/10 hover:text-white gap-2"
+                  className="inline-flex items-center justify-center whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-800 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-white data-[state=active]:text-gray-900 data-[state=active]:shadow-sm gap-2"
                 >
-                  <Type className="h-4 w-4 transition-transform duration-300 ease-in-out" />
+                  <Type className="h-4 w-4" />
                   Letter Icon
                 </TabsTrigger>
               </TabsList>
             </div>
 
-            <TabsContent
-              value="upload"
-              className="mt-6 animate-in fade-in-50 slide-in-from-bottom-4 duration-300"
-            >
-              <Card className="bg-white/5 backdrop-blur-sm border border-white/10 shadow-2xl">
+            <TabsContent value="upload" className="mt-6">
+              <Card className="border border-gray-200 shadow-sm">
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-lg font-medium text-white">
+                  <CardTitle className="text-lg font-medium text-gray-900">
                     Upload Image
                   </CardTitle>
-                  <CardDescription className="text-sm text-gray-300">
+                  <CardDescription className="text-sm text-gray-600">
                     Upload an image to generate favicons in multiple sizes
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div
                     className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${isDragging
-                        ? "border-white/40 bg-white/10"
-                        : "border-white/20 hover:border-white/30 hover:bg-white/5"
+                      ? "border-gray-400 bg-gray-50"
+                      : "border-gray-200 hover:border-gray-300"
                       }`}
                     onDrop={handleDrop}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
                   >
                     {uploadedImage ? (
-                      <div className="flex flex-col items-center space-y-4">
+                      <div className="space-y-4">
                         <div className="relative inline-block">
                           <Image
                             src={imagePreview || uploadedImage}
                             alt="Preview"
                             width={80}
                             height={80}
-                            className="object-cover"
+                            className="object-cover border border-gray-200"
                             style={{
                               borderRadius: `${(8 * borderRadius) / 100}px`,
                             }}
@@ -312,7 +298,7 @@ export default function FaviconGenerator() {
                           <Button
                             size="sm"
                             variant="outline"
-                            className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full bg-white/90 border-white/20 hover:bg-white"
+                            className="absolute -top-2 -right-2 h-6 w-6 p-0 rounded-full bg-white border-gray-200"
                             onClick={() => {
                               setUploadedImage(null);
                               setImagePreview(null);
@@ -322,22 +308,28 @@ export default function FaviconGenerator() {
                             <X className="h-3 w-3" />
                           </Button>
                         </div>
+                        <Button
+                          onClick={generateFaviconFromImage}
+                          className="bg-black hover:bg-gray-800 text-white h-9 px-4 text-sm font-medium"
+                        >
+                          Generate Favicons
+                        </Button>
                       </div>
                     ) : (
                       <div className="space-y-4">
                         <Upload className="mx-auto h-8 w-8 text-gray-400" />
                         <div>
-                          <p className="text-sm font-medium text-white">
+                          <p className="text-sm font-medium text-gray-900">
                             Drop your image here
                           </p>
-                          <p className="text-xs text-gray-400 mt-1">
+                          <p className="text-xs text-gray-500 mt-1">
                             or click to browse files
                           </p>
                         </div>
                         <Button
                           onClick={() => fileInputRef.current?.click()}
                           variant="outline"
-                          className="h-9 px-4 text-sm font-medium bg-white/10 border-white/20 text-white hover:bg-white/20"
+                          className="h-9 px-4 text-sm font-medium"
                         >
                           Choose File
                         </Button>
@@ -354,19 +346,12 @@ export default function FaviconGenerator() {
                       </div>
                     )}
                   </div>
-                  {uploadedImage && (
-                    <div className="flex justify-center">
-                      <Button
-                        onClick={generateFaviconFromImage}
-                        className="h-9 px-6 text-sm font-medium bg-white text-gray-900 hover:bg-gray-100"
-                      >
-                        Generate Favicons
-                      </Button>
-                    </div>
-                  )}
 
                   {uploadedImage && (
                     <div className="space-y-3">
+                      <Label className="text-sm font-medium text-gray-900">
+                        Border Radius
+                      </Label>
                       <div className="space-y-2">
                         <Slider
                           min={0}
@@ -376,7 +361,7 @@ export default function FaviconGenerator() {
                           onValueChange={(value) => setBorderRadius(value[0])}
                           className="w-full"
                         />
-                        <div className="flex justify-between text-sm text-gray-400 font-mono">
+                        <div className="flex justify-between text-xs text-gray-500">
                           <span>Square</span>
                           <span>{borderRadius}%</span>
                           <span>Rounded</span>
@@ -388,16 +373,13 @@ export default function FaviconGenerator() {
               </Card>
             </TabsContent>
 
-            <TabsContent
-              value="letter"
-              className="mt-6 animate-in fade-in-50 slide-in-from-bottom-4 duration-300"
-            >
-              <Card className="bg-white/5 backdrop-blur-sm border border-white/10 shadow-2xl">
+            <TabsContent value="letter" className="mt-6">
+              <Card className="border border-gray-200 shadow-sm">
                 <CardHeader className="pb-4">
-                  <CardTitle className="text-lg font-medium text-white">
+                  <CardTitle className="text-lg font-medium text-gray-900">
                     Letter Icon
                   </CardTitle>
-                  <CardDescription className="text-sm text-gray-300">
+                  <CardDescription className="text-sm text-gray-600">
                     Create a favicon from a single letter with custom styling
                   </CardDescription>
                 </CardHeader>
@@ -405,7 +387,7 @@ export default function FaviconGenerator() {
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                     <div className="space-y-6">
                       <div className="space-y-2">
-                        <Label className="text-sm font-medium text-white">
+                        <Label className="text-sm font-medium text-gray-900">
                           Letter
                         </Label>
                         <Input
@@ -414,14 +396,13 @@ export default function FaviconGenerator() {
                             setLetter(e.target.value.slice(0, 1))
                           }
                           placeholder="A"
-                          className="text-center text-lg font-medium h-12 bg-white/10 border-white/20 text-white placeholder:text-gray-400"
-                          required
+                          className="text-center text-lg font-medium h-12"
                           maxLength={1}
                         />
                       </div>
 
                       <div className="space-y-3">
-                        <Label className="text-sm font-medium text-white">
+                        <Label className="text-sm font-medium text-gray-900">
                           Background Color
                         </Label>
                         <div className="grid grid-cols-4 gap-2">
@@ -430,8 +411,8 @@ export default function FaviconGenerator() {
                               key={color.value}
                               onClick={() => setBackgroundColor(color.value)}
                               className={`h-10 rounded-md border transition-all ${backgroundColor === color.value
-                                  ? "border-white ring-2 ring-white/50 ring-offset-2 ring-offset-transparent"
-                                  : "border-white/20 hover:border-white/40"
+                                ? "border-gray-800 ring-2 ring-gray-800 ring-offset-2"
+                                : "border-gray-200 hover:border-gray-300"
                                 }`}
                               style={{ backgroundColor: color.value }}
                               title={color.name}
@@ -441,23 +422,23 @@ export default function FaviconGenerator() {
                       </div>
 
                       <div className="space-y-3">
-                        <Label className="text-sm font-medium text-white">
+                        <Label className="text-sm font-medium text-gray-900">
                           Text Color
                         </Label>
                         <div className="flex gap-2">
                           <button
                             onClick={() => setTextColor("#FFFFFF")}
                             className={`h-10 w-10 rounded-md border bg-white ${textColor === "#FFFFFF"
-                                ? "border-white ring-2 ring-white/50 ring-offset-2 ring-offset-transparent"
-                                : "border-white/20 hover:border-white/40"
+                              ? "border-gray-800 ring-2 ring-gray-800 ring-offset-2"
+                              : "border-gray-200 hover:border-gray-300"
                               }`}
                             title="White"
                           />
                           <button
                             onClick={() => setTextColor("#000000")}
                             className={`h-10 w-10 rounded-md border bg-black ${textColor === "#000000"
-                                ? "border-white ring-2 ring-white/50 ring-offset-2 ring-offset-transparent"
-                                : "border-white/20 hover:border-white/40"
+                              ? "border-gray-800 ring-2 ring-gray-800 ring-offset-2"
+                              : "border-gray-200 hover:border-gray-300"
                               }`}
                             title="Black"
                           />
@@ -465,16 +446,19 @@ export default function FaviconGenerator() {
                       </div>
 
                       <div className="space-y-3">
+                        <Label className="text-sm font-medium text-gray-900">
+                          Border Radius
+                        </Label>
                         <div className="space-y-2">
                           <Slider
                             min={0}
-                            max={200}
+                            max={50}
                             step={1}
                             value={[borderRadius]}
                             onValueChange={(value) => setBorderRadius(value[0])}
                             className="w-full"
                           />
-                          <div className="flex justify-between text-sm text-gray-400 font-mono">
+                          <div className="flex justify-between text-xs text-gray-500">
                             <span>Square</span>
                             <span>{borderRadius}%</span>
                             <span>Rounded</span>
@@ -484,11 +468,11 @@ export default function FaviconGenerator() {
                     </div>
 
                     <div className="flex flex-col items-center justify-center space-y-6">
-                      <div className="text-xs font-medium text-gray-400 uppercase tracking-wide">
+                      <div className="text-xs font-medium text-gray-500 uppercase tracking-wide">
                         Preview
                       </div>
                       <div
-                        className="w-20 h-20 flex items-center justify-center text-2xl font-semibold border-2 border-white/60"
+                        className="w-20 h-20 flex items-center justify-center text-2xl font-semibold border border-gray-200"
                         style={{
                           backgroundColor,
                           color: textColor,
@@ -499,26 +483,10 @@ export default function FaviconGenerator() {
                       >
                         {letter.toUpperCase()}
                       </div>
-
-                      <Alert
-                        variant="default"
-                        className="bg-white/5 border-white/10"
-                      >
-                        <AlertCircleIcon className="text-white" />
-                        <AlertTitle className="text-white">
-                          Hey please notice!
-                        </AlertTitle>
-                        <AlertDescription className="text-gray-300">
-                          The icon result will not include with border.
-                          <br />
-                          The border is just for preview purpose.
-                        </AlertDescription>
-                      </Alert>
-
                       <Button
                         onClick={generateFaviconFromLetter}
                         disabled={!letter}
-                        className="bg-white text-gray-900 hover:bg-gray-100 h-9 px-4 text-sm font-medium w-full disabled:opacity-50"
+                        className="bg-black hover:bg-gray-800 text-white h-9 px-4 text-sm font-medium w-full"
                       >
                         Generate Favicons
                       </Button>
@@ -531,17 +499,24 @@ export default function FaviconGenerator() {
 
           {/* Results */}
           {generatedFavicons.length > 0 && (
-            <Card className="bg-white/5 backdrop-blur-sm border border-white/10 shadow-2xl animate-in fade-in-50 slide-in-from-bottom-5 duration-500">
+            <Card className="border border-gray-200 shadow-sm animate-in fade-in-50 slide-in-from-bottom-5 duration-500">
               <CardHeader className="pb-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <CardTitle className="text-lg font-medium text-white">
+                    <CardTitle className="text-lg font-medium text-gray-900">
                       Generated Favicons
                     </CardTitle>
-                    <CardDescription className="text-sm text-gray-300">
+                    <CardDescription className="text-sm text-gray-600">
                       Click any favicon to download individually
                     </CardDescription>
                   </div>
+                  <Button
+                    onClick={downloadAll}
+                    className="bg-black hover:bg-gray-800 text-white h-9 px-4 text-sm font-medium flex items-center gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    Download All
+                  </Button>
                 </div>
               </CardHeader>
               <CardContent>
@@ -549,7 +524,7 @@ export default function FaviconGenerator() {
                   {generatedFavicons.map((favicon, index) => (
                     <div
                       key={favicon.size}
-                      className="flex flex-col items-center space-y-3 p-4 border border-white/10 rounded-lg hover:bg-white/10 cursor-pointer transition-all animate-in fade-in-0 slide-in-from-bottom-3"
+                      className="flex flex-col items-center space-y-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer transition-all animate-in fade-in-0 slide-in-from-bottom-3"
                       onClick={() => downloadFavicon(favicon.url, favicon.size)}
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
@@ -557,7 +532,7 @@ export default function FaviconGenerator() {
                         <img
                           src={favicon.url || "/placeholder.svg"}
                           alt={`${favicon.size}x${favicon.size}`}
-                          className=""
+                          className="border border-gray-200 rounded"
                           style={{
                             width: favicon.size > 48 ? 48 : favicon.size,
                             height: favicon.size > 48 ? 48 : favicon.size,
@@ -566,22 +541,13 @@ export default function FaviconGenerator() {
                       </picture>
                       <Badge
                         variant="secondary"
-                        className="font-mono text-xs bg-white/10 text-gray-300 hover:bg-white/20"
+                        className="font-mono text-xs bg-gray-100 text-gray-700 hover:bg-gray-100"
                       >
                         {favicon.size}×{favicon.size}
                       </Badge>
                     </div>
                   ))}
                 </div>
-                <CardFooter className="mt-8 w-full">
-                  <Button
-                    onClick={downloadAll}
-                    className="w-full bg-white text-gray-900 hover:bg-gray-100 h-9 px-4 text-sm font-medium flex items-center gap-2"
-                  >
-                    <Download className="h-4 w-4" />
-                    Download All
-                  </Button>
-                </CardFooter>
               </CardContent>
             </Card>
           )}

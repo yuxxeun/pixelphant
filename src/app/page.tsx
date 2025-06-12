@@ -1,7 +1,7 @@
 "use client";
 
-import FaviconGenerator from "@/components/section/generator";
+import Generator from "@/components/section/generator";
 
 export default function Page() {
-  return <FaviconGenerator />;
+  return <Generator />;
 }
