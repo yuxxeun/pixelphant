@@ -43,6 +43,69 @@ const BACKGROUND_COLORS = [
   { name: "Yellow", value: "#f5a623" },
 ];
 
+// ICO file creation utilities
+function createICOFile(
+  images: { size: number; data: Uint8Array }[],
+): Uint8Array {
+  const header = new ArrayBuffer(6);
+  const headerView = new DataView(header);
+
+  // ICO header
+  headerView.setUint16(0, 0, true); // Reserved
+  headerView.setUint16(2, 1, true); // Type (1 = ICO)
+  headerView.setUint16(4, images.length, true); // Number of images
+
+  const directorySize = images.length * 16;
+  let offset = 6 + directorySize;
+
+  // Create directory entries
+  const directory = new ArrayBuffer(directorySize);
+  const directoryView = new DataView(directory);
+
+  images.forEach((img, index) => {
+    const entryOffset = index * 16;
+    directoryView.setUint8(entryOffset, img.size === 256 ? 0 : img.size); // Width
+    directoryView.setUint8(entryOffset + 1, img.size === 256 ? 0 : img.size); // Height
+    directoryView.setUint8(entryOffset + 2, 0); // Color palette
+    directoryView.setUint8(entryOffset + 3, 0); // Reserved
+    directoryView.setUint16(entryOffset + 4, 1, true); // Color planes
+    directoryView.setUint16(entryOffset + 6, 32, true); // Bits per pixel
+    directoryView.setUint32(entryOffset + 8, img.data.length, true); // Image size
+    directoryView.setUint32(entryOffset + 12, offset, true); // Image offset
+    offset += img.data.length;
+  });
+
+  // Combine all parts
+  const totalSize =
+    6 + directorySize + images.reduce((sum, img) => sum + img.data.length, 0);
+  const result = new Uint8Array(totalSize);
+
+  result.set(new Uint8Array(header), 0);
+  result.set(new Uint8Array(directory), 6);
+
+  let currentOffset = 6 + directorySize;
+  images.forEach((img) => {
+    result.set(img.data, currentOffset);
+    currentOffset += img.data.length;
+  });
+
+  return result;
+}
+
+function canvasToICOData(canvas: HTMLCanvasElement): Uint8Array {
+  // Convert canvas to PNG data
+  const dataUrl = canvas.toDataURL("image/png");
+  const base64Data = dataUrl.split(",")[1];
+  const binaryString = atob(base64Data);
+  const bytes = new Uint8Array(binaryString.length);
+
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+
+  return bytes;
+}
+
 function launchConfetti() {
   const duration = 2000;
   const animationEnd = Date.now() + duration;
@@ -73,7 +136,7 @@ export default function Generator() {
   const [backgroundColor, setBackgroundColor] = useState("#000000");
   const [textColor, setTextColor] = useState("#FFFFFF");
   const [generatedFavicons, setGeneratedFavicons] = useState<
-    { size: number; url: string }[]
+    { size: number; url: string; icoData?: Uint8Array }[]
   >([]);
   const [isDragging, setIsDragging] = useState(false);
   const [borderRadius, setBorderRadius] = useState(20);
@@ -124,7 +187,8 @@ export default function Generator() {
     const img = new window.Image();
     img.crossOrigin = "anonymous";
     img.onload = () => {
-      const favicons: { size: number; url: string }[] = [];
+      const favicons: { size: number; url: string; icoData: Uint8Array }[] = [];
+      const icoImages: { size: number; data: Uint8Array }[] = [];
 
       FAVICON_SIZES.forEach((size) => {
         canvas.width = size;
@@ -141,7 +205,22 @@ export default function Generator() {
         ctx.restore();
 
         const dataUrl = canvas.toDataURL("image/png");
-        favicons.push({ size, url: dataUrl });
+        const icoData = canvasToICOData(canvas);
+
+        favicons.push({ size, url: dataUrl, icoData });
+        icoImages.push({ size, data: icoData });
+      });
+
+      // Create multi-size ICO file
+      const multiSizeIco = createICOFile(icoImages);
+      const icoBlob = new Blob([multiSizeIco], { type: "image/x-icon" });
+      const icoUrl = URL.createObjectURL(icoBlob);
+
+      // Add multi-size ICO to the list
+      favicons.push({
+        size: 0, // Special indicator for multi-size ICO
+        url: icoUrl,
+        icoData: multiSizeIco,
       });
 
       setGeneratedFavicons(favicons);
@@ -157,7 +236,8 @@ export default function Generator() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const favicons: { size: number; url: string }[] = [];
+    const favicons: { size: number; url: string; icoData: Uint8Array }[] = [];
+    const icoImages: { size: number; data: Uint8Array }[] = [];
 
     FAVICON_SIZES.forEach((size) => {
       canvas.width = size;
@@ -176,7 +256,7 @@ export default function Generator() {
       ctx.fillRect(0, 0, size, size);
 
       ctx.fillStyle = textColor;
-      ctx.font = `600 ${size * 0.55}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
+      ctx.font = `600 ${size * 0.7}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(letter.toUpperCase(), size / 2, size / 2);
@@ -184,23 +264,50 @@ export default function Generator() {
       ctx.restore();
 
       const dataUrl = canvas.toDataURL("image/png");
-      favicons.push({ size, url: dataUrl });
+      const icoData = canvasToICOData(canvas);
+
+      favicons.push({ size, url: dataUrl, icoData });
+      icoImages.push({ size, data: icoData });
+    });
+
+    // Create multi-size ICO file
+    const multiSizeIco = createICOFile(icoImages);
+    const icoBlob = new Blob([multiSizeIco], { type: "image/x-icon" });
+    const icoUrl = URL.createObjectURL(icoBlob);
+
+    // Add multi-size ICO to the list
+    favicons.push({
+      size: 0, // Special indicator for multi-size ICO
+      url: icoUrl,
+      icoData: multiSizeIco,
     });
 
     setGeneratedFavicons(favicons);
     launchConfetti();
   }, [letter, backgroundColor, textColor, borderRadius]);
 
-  const downloadFavicon = useCallback((url: string, size: number) => {
-    const link = document.createElement("a");
-    link.download = `favicon-${size}x${size}.png`;
-    link.href = url;
-    link.click();
-  }, []);
+  const downloadFavicon = useCallback(
+    (favicon: { size: number; url: string; icoData?: Uint8Array }) => {
+      const link = document.createElement("a");
+
+      if (favicon.size === 0) {
+        // Multi-size ICO file
+        link.download = `favicon.ico`;
+        link.href = favicon.url;
+      } else {
+        // Individual PNG files
+        link.download = `favicon-${favicon.size}x${favicon.size}.png`;
+        link.href = favicon.url;
+      }
+
+      link.click();
+    },
+    [],
+  );
 
   const downloadAll = useCallback(() => {
     generatedFavicons.forEach((favicon, index) => {
-      setTimeout(() => downloadFavicon(favicon.url, favicon.size), index * 100);
+      setTimeout(() => downloadFavicon(favicon), index * 100);
     });
   }, [generatedFavicons, downloadFavicon]);
 
@@ -244,7 +351,8 @@ export default function Generator() {
             <h1 className="text-2xl font-bold text-white">{Site.title}</h1>
           </div>
           <p className="text-gray-300 text-sm leading-relaxed max-w-2xl">
-            Generate high-quality favicons for your website.
+            Generate high-quality favicons for your website in PNG and ICO
+            formats.
             <br />
             Upload an image or create from a letter with precise control over
             styling.
@@ -282,7 +390,8 @@ export default function Generator() {
                     Upload Image
                   </CardTitle>
                   <CardDescription className="text-sm text-gray-300">
-                    Upload an image to generate favicons in multiple sizes
+                    Upload an image to generate favicons in multiple sizes (PNG
+                    & ICO)
                   </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-6">
@@ -399,6 +508,7 @@ export default function Generator() {
                   </CardTitle>
                   <CardDescription className="text-sm text-gray-300">
                     Create a favicon from a single letter with custom styling
+                    (PNG & ICO)
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -491,13 +601,13 @@ export default function Generator() {
                         Preview
                       </div>
                       <div
-                        className="w-20 h-20 flex items-center justify-center text-2xl font-semibold border-2 border-white/60"
+                        className="w-20 h-20 flex items-center justify-center text-4xl font-semibold border-2 border-white/60"
                         style={{
                           backgroundColor,
                           color: textColor,
                           borderRadius: `${(20 * borderRadius) / 100}px`,
                           fontFamily:
-                            '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                            "-apple-system, BlinkMacSystemFont, Geist Mono",
                         }}
                       >
                         {letter.toUpperCase()}
@@ -542,7 +652,8 @@ export default function Generator() {
                       Generated Favicons
                     </CardTitle>
                     <CardDescription className="text-sm text-gray-300">
-                      Click any favicon to download individually
+                      Click any favicon to download individually (PNG files +
+                      ICO file)
                     </CardDescription>
                   </div>
                 </div>
@@ -551,27 +662,47 @@ export default function Generator() {
                 <div className="grid grid-cols-3 md:grid-cols-6 gap-4">
                   {generatedFavicons.map((favicon, index) => (
                     <div
-                      key={favicon.size}
+                      key={favicon.size === 0 ? "ico" : favicon.size}
                       className="flex flex-col items-center space-y-3 p-4 border border-white/10 rounded-lg hover:bg-white/10 cursor-pointer transition-all animate-in fade-in-0 slide-in-from-bottom-3"
-                      onClick={() => downloadFavicon(favicon.url, favicon.size)}
+                      onClick={() => downloadFavicon(favicon)}
                       style={{ animationDelay: `${index * 50}ms` }}
                     >
                       <picture>
                         <img
                           src={favicon.url || "/placeholder.svg"}
-                          alt={`${favicon.size}x${favicon.size}`}
+                          alt={
+                            favicon.size === 0
+                              ? "favicon.ico"
+                              : `${favicon.size}x${favicon.size}`
+                          }
                           className=""
                           style={{
-                            width: favicon.size > 48 ? 48 : favicon.size,
-                            height: favicon.size > 48 ? 48 : favicon.size,
+                            width:
+                              favicon.size === 0
+                                ? 48
+                                : favicon.size > 48
+                                  ? 48
+                                  : favicon.size,
+                            height:
+                              favicon.size === 0
+                                ? 48
+                                : favicon.size > 48
+                                  ? 48
+                                  : favicon.size,
                           }}
                         />
                       </picture>
                       <Badge
                         variant="secondary"
-                        className="font-mono text-xs bg-white/10 text-gray-300 hover:bg-white/20"
+                        className={`font-mono text-xs text-gray-300 hover:bg-white/20 ${
+                          favicon.size === 0
+                            ? "bg-blue-500/20 text-blue-300"
+                            : "bg-white/10"
+                        }`}
                       >
-                        {favicon.size}×{favicon.size}
+                        {favicon.size === 0
+                          ? "ICO"
+                          : `${favicon.size}×${favicon.size}`}
                       </Badge>
                     </div>
                   ))}
@@ -582,7 +713,7 @@ export default function Generator() {
                     className="w-full bg-white text-gray-900 hover:bg-gray-100 h-9 px-4 text-sm font-medium flex items-center gap-2"
                   >
                     <Download className="h-4 w-4" />
-                    Download All
+                    Download All (PNG + ICO)
                   </Button>
                 </CardFooter>
               </CardContent>
