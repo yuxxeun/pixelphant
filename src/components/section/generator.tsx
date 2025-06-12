@@ -29,6 +29,7 @@ import confetti from "canvas-confetti";
 import Image from "next/image";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Site } from "@/lib/constant";
+import Footer from "../footer";
 
 const FAVICON_SIZES = [16, 32, 48, 64, 128, 256];
 const BACKGROUND_COLORS = [
@@ -37,7 +38,7 @@ const BACKGROUND_COLORS = [
   { name: "Blue", value: "#0070f3" },
   { name: "Purple", value: "#7c3aed" },
   { name: "Green", value: "#00d9ff" },
-  { name: "Orange", value: "#ff6154" },
+  { name: "Orange", value: "#ff4500" },
   { name: "Pink", value: "#ff0080" },
   { name: "Yellow", value: "#f5a623" },
 ];
@@ -235,13 +236,12 @@ export default function Generator() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-black">
       <div className="max-w-4xl mx-auto px-6 py-12">
-        {/* Header */}
         <div className="mb-12">
           <div className="flex items-center gap-3 mb-4">
             <div className="p-2 bg-white/10 backdrop-blur-sm rounded-lg border border-white/20">
               <Sparkles className="animate-pulse h-5 w-5 text-white" />
             </div>
-            <h1 className="text-2xl font-semibold text-white">{Site.title}</h1>
+            <h1 className="text-2xl font-bold text-white">{Site.title}</h1>
           </div>
           <p className="text-gray-300 text-sm leading-relaxed max-w-2xl">
             Generate high-quality favicons for your website.
@@ -251,7 +251,6 @@ export default function Generator() {
           </p>
         </div>
 
-        {/* Main Content */}
         <div className="space-y-8">
           <Tabs defaultValue="upload" className="w-full">
             <div className="flex justify-center mb-2">
@@ -591,6 +590,9 @@ export default function Generator() {
           )}
         </div>
         <canvas ref={canvasRef} className="hidden" />
+      </div>
+      <div>
+        <Footer />
       </div>
     </div>
   );
