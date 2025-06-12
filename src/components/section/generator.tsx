@@ -244,7 +244,7 @@ export default function FaviconGenerator() {
             <h1 className="text-2xl font-semibold text-white">{Site.title}</h1>
           </div>
           <p className="text-gray-300 text-sm leading-relaxed max-w-2xl">
-            Generate high-quality favicons for your website.
+            Generate high-quality favicons for your app.
             <br />
             Upload an image or create from a letter with precise control over
             styling.
@@ -288,11 +288,10 @@ export default function FaviconGenerator() {
                 </CardHeader>
                 <CardContent className="space-y-6">
                   <div
-                    className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${
-                      isDragging
+                    className={`border-2 border-dashed rounded-lg p-8 text-center transition-all ${isDragging
                         ? "border-white/40 bg-white/10"
                         : "border-white/20 hover:border-white/30 hover:bg-white/5"
-                    }`}
+                      }`}
                     onDrop={handleDrop}
                     onDragOver={handleDragOver}
                     onDragLeave={handleDragLeave}
@@ -430,11 +429,10 @@ export default function FaviconGenerator() {
                             <button
                               key={color.value}
                               onClick={() => setBackgroundColor(color.value)}
-                              className={`h-10 rounded-md border transition-all ${
-                                backgroundColor === color.value
+                              className={`h-10 rounded-md border transition-all ${backgroundColor === color.value
                                   ? "border-white ring-2 ring-white/50 ring-offset-2 ring-offset-transparent"
                                   : "border-white/20 hover:border-white/40"
-                              }`}
+                                }`}
                               style={{ backgroundColor: color.value }}
                               title={color.name}
                             />
@@ -449,20 +447,18 @@ export default function FaviconGenerator() {
                         <div className="flex gap-2">
                           <button
                             onClick={() => setTextColor("#FFFFFF")}
-                            className={`h-10 w-10 rounded-md border bg-white ${
-                              textColor === "#FFFFFF"
+                            className={`h-10 w-10 rounded-md border bg-white ${textColor === "#FFFFFF"
                                 ? "border-white ring-2 ring-white/50 ring-offset-2 ring-offset-transparent"
                                 : "border-white/20 hover:border-white/40"
-                            }`}
+                              }`}
                             title="White"
                           />
                           <button
                             onClick={() => setTextColor("#000000")}
-                            className={`h-10 w-10 rounded-md border bg-black ${
-                              textColor === "#000000"
+                            className={`h-10 w-10 rounded-md border bg-black ${textColor === "#000000"
                                 ? "border-white ring-2 ring-white/50 ring-offset-2 ring-offset-transparent"
                                 : "border-white/20 hover:border-white/40"
-                            }`}
+                              }`}
                             title="Black"
                           />
                         </div>
