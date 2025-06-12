@@ -1,9 +1,7 @@
-import Generator from "@/components/section/generator";
+"use client";
 
-export default function Home() {
-  return (
-    <main>
-      <Generator />
-    </main>
-  );
+import FaviconGenerator from "@/components/section/generator";
+
+export default function Page() {
+  return <FaviconGenerator />;
 }
